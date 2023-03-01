@@ -2,44 +2,54 @@
 header("Content-type: image/JPEG");
 use UAParser\Parser;
 require_once 'vendor/autoload.php';
-$im = imagecreatefromjpeg("xhxh.jpg"); 
+$im = imagecreatefromjpeg("ip.jpg"); 
 $ip = $_SERVER["REMOTE_ADDR"];
 $ua = $_SERVER['HTTP_USER_AGENT'];
 $get = $_GET["s"];
 $get = base64_decode(str_replace(" ","+",$get));
-$weekarray = array("日","一","二","三","四","五","六"); 
+$weekarray = array("Sunday","Monday","Tuesday","Wednesday","Thursday","Firday","Saturday"); 
 //ua
 $parser = Parser::create();
 $result = $parser->parse($ua);
 $os = $result->os->toString(); // Mac OS X
 $browser = $result->device->family.'-'.$result->ua->family;// Safari 6.0.2 
-//地址、温度
-$data = json_decode(curl_get('https://api.xhboke.com/ip/v1.php?ip='.$ip), true);
-$country = $data['site']['country']; 
-$region = $data['site']['region']; 
-$adcode = $data['site']['adcode']; 
-$weather = $data['city']['weather'];
-$temperature = $data['city']['temperature'];
-//历史上今天
-//$data = json_decode(get_curl('https://xhboke.com/mz/today.php'), true);
-//$today = $data['cover']['title']; 
+
+//地址
+
+$url = 'https://api.vore.top/api/IPdata?ip='.$ip;
+$data = json_decode(curl_get($url), true);
+
+$info1 = $data['ipdata']['info1'];
+$info2 = $data['ipdata']['info2'];
+$info3 = $data['ipdata']['info3'];
+$info = $info1 . $info2 . $info3;
+
+$url_t = 'https://fanyi.youdao.com/translate?&doctype=json&type=AUTO&i='.$info;
+$data_json = curl_get($url_t);
+$data_t = json_decode(curl_get($url_t), true);
+$trans = substr_replace($data_t['translateResult'][0][0]['tgt'], "", -1);
+
 //定义颜色
+
 $black = ImageColorAllocate($im, 0,0,0);//定义黑色的值
 $red = ImageColorAllocate($im, 255,0,0);//红色
-$font = 'msyh.ttf';//加载字体
+$white = ImageColorAllocate($im, 255,255,255);
+$font = 'Spyced.ttf';//加载字体
 //输出
-imagettftext($im, 16, 0, 10, 40, $red, $font,'欢迎您来自'.$country.'-'.$region.'的朋友');
-imagettftext($im, 16, 0, 10, 72, $red, $font, '今天是'.date('Y年n月j日').' 星期'.$weekarray[date("w")]);//当前时间添加到图片
-imagettftext($im, 16, 0, 10, 104, $red, $font,'您的IP是:'.$ip.'  '.$weather." ".$temperature.'℃');//ip
-imagettftext($im, 16, 0, 10, 140, $red, $font,'您使用的是'.$os.'操作系统');
-imagettftext($im, 16, 0, 10, 175, $red, $font,'您使用的是'.$browser);
-imagettftext($im, 13, 0, 10, 200, $black, $font,$get); 
+imagettftext($im, 50, 0, 10, 70, $white, $font,'We Are Watching You.'); 
+imagettftext($im, 50, 0, 10, 154, $white, $font,'Mortal from '.$trans.' !');
+imagettftext($im, 50, 0, 10, 238, $white, $font, 'Today is '.$weekarray[date("w")].','.date(' F d, Y.'));//当前时间添加到图片
+imagettftext($im, 50, 0, 10, 322, $white, $font,'Your IP address is '.$ip);//ip和温度
+imagettftext($im, 50, 0, 10, 406, $white, $font,'You are using an '.$os.' OS');
+imagettftext($im, 50, 0, 10, 490, $white, $font,'Your browser is '.$browser);
+imagettftext($im, 50, 0, 10, 574, $white, $font,'Worship Silicon, Sacrifice for Computation !'); 
 ImageGif($im);
 ImageDestroy($im);
 
 
 function curl_get($url, array $params = array(), $timeout = 6){
     $ch = curl_init();
+    curl_setopt($ch, CURLOPT_ENCODING, "");
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
@@ -48,5 +58,3 @@ function curl_get($url, array $params = array(), $timeout = 6){
     return $file_contents;
 }
 ?>
-
-
