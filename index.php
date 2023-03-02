@@ -43,7 +43,7 @@ imagettftext($im, 50, 0, 10, 322, $white, $font,'Your IP address is '.$ip);//ipå
 imagettftext($im, 50, 0, 10, 406, $white, $font,'You are using an '.$os.' OS');
 imagettftext($im, 50, 0, 10, 490, $white, $font,'Your browser is '.$browser);
 imagettftext($im, 50, 0, 10, 574, $white, $font,'Worship Silicon, Sacrifice for Computation !'); 
-ImageGif($im);
+Imagejpeg($im);
 ImageDestroy($im);
 
 
